@@ -6,10 +6,13 @@
 #define CEDAR_RGB_IMAGE_H
 
 #include "Image.h"
+#include "GrayImage.h"
+#include <memory>
 
 class RgbImage : public Image
 {
-
+public:
+    GrayImage to_gray_image();
 };
 
 

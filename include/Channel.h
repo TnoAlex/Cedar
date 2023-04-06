@@ -9,17 +9,22 @@
 #include <map>
 #include <memory>
 #include "image_type.h"
-#include "Pixel.h"
+#include "type_assign.h"
+#include "logger.h"
 
 using namespace std;
 namespace ublas = boost::numeric::ublas;
 
 class Channel
 {
-    int size;
-    map<int, shared_ptr<ublas::matrix<Pixel>>> *ch;
+public:
+    int size = 0;
+    map<int, shared_ptr<ublas::matrix<uint>>> *chunks{};
 
-    Channel(ImageType type, int w, int h);
+    Channel();
+
+    Channel(ImageType type, int row, int col, const uchar *raw);
+
     ~Channel();
 };
 

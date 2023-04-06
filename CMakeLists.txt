@@ -12,6 +12,7 @@ set(BOOST_INCLUDE_DIR ${BOOST_ROOT}/boost)
 set(BOOST_LIBRARY_DIR ${BOOST_ROOT}/lib)
 find_package(Boost COMPONENTS REQUIRED filesystem program_options log)
 
+add_definitions(-D_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING)
 add_executable(Cedar CedarApplication.cpp)
 
 include_directories(${BOOST_ROOT} ${PROJECT_SOURCE_DIR}/include)

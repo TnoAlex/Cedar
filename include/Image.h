@@ -5,19 +5,37 @@
 #ifndef CEDAR_IMAGE_H
 #define CEDAR_IMAGE_H
 
+#define STB_IMAGE_IMPLEMENTATION
+#define STBI_WINDOWS_UTF8
+#define STBI_FAILURE_USERMSG
+
+#include <memory>
+#include <string>
+#include <cassert>
 #include "Channel.h"
 #include "image_type.h"
-#include <memory>
+#include "logger.h"
+#include "type_assign.h"
+#include "stb/stb_image.h"
+
 
 class Image
 {
-    int width,height;
+public:
+    int width = 0, height = 0;
     std::shared_ptr<Channel> channel;
     ImageType type;
 
-    Image(unsigned char * raw,int w,int h,int type);
-    ~Image();
-    std::shared_ptr<ublas::matrix<Pixel>> get_page(int d);
+    Image();
+
+    Image(unsigned char *raw, int w, int h, int type);
+
+    explicit Image(const std::string &fileName);
+
+    [[nodiscard]] std::shared_ptr<ublas::matrix<uint>> get_chunk(int d) const;
+
+protected:
+    Image copy() const;
 };
 
 

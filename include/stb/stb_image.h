@@ -852,11 +852,11 @@ static int stbi__stdio_read(void *user, char *data, int size)
 
 static void stbi__stdio_skip(void *user, int n)
 {
-   int ch;
+   int chunks;
    fseek((FILE*) user, n, SEEK_CUR);
-   ch = fgetc((FILE*) user);  /* have to read a byte to reset feof()'s flag */
-   if (ch != EOF) {
-      ungetc(ch, (FILE *) user);  /* push byte back onto stream if valid. */
+   chunks = fgetc((FILE*) user);  /* have to read a byte to reset feof()'s flag */
+   if (chunks != EOF) {
+      ungetc(chunks, (FILE *) user);  /* push byte back onto stream if valid. */
    }
 }
 
@@ -5232,7 +5232,7 @@ static int stbi__parse_png_file(stbi__png *z, int scan, int req_comp)
                ++s->img_n;
             }
             STBI_FREE(z->expanded); z->expanded = NULL;
-            // end of PNG chunk, read and skip CRC
+            // end of PNG chunks, read and skip CRC
             stbi__get32be(s);
             return 1;
          }
@@ -5243,18 +5243,18 @@ static int stbi__parse_png_file(stbi__png *z, int scan, int req_comp)
             if ((c.type & (1 << 29)) == 0) {
                #ifndef STBI_NO_FAILURE_STRINGS
                // not threadsafe
-               static char invalid_chunk[] = "XXXX PNG chunk not known";
+               static char invalid_chunk[] = "XXXX PNG chunks not known";
                invalid_chunk[0] = STBI__BYTECAST(c.type >> 24);
                invalid_chunk[1] = STBI__BYTECAST(c.type >> 16);
                invalid_chunk[2] = STBI__BYTECAST(c.type >>  8);
                invalid_chunk[3] = STBI__BYTECAST(c.type >>  0);
                #endif
-               return stbi__err(invalid_chunk, "PNG not supported: unknown PNG chunk type");
+               return stbi__err(invalid_chunk, "PNG not supported: unknown PNG chunks type");
             }
             stbi__skip(s, c.length);
             break;
       }
-      // end of PNG chunk, read and skip CRC
+      // end of PNG chunks, read and skip CRC
       stbi__get32be(s);
    }
 }
@@ -7822,7 +7822,7 @@ STBIDEF int stbi_is_16_bit_from_callbacks(stbi_io_callbacks const *c, void *user
                          optimize PNG (ryg)
                          fix bug in interlaced PNG with user-specified Channel count (stb)
       1.46  (2014-08-26)
-              fix broken tRNS chunk (colorkey-style transparency) in non-paletted PNG
+              fix broken tRNS chunks (colorkey-style transparency) in non-paletted PNG
       1.45  (2014-08-16)
               fix MSVC-ARM internal compiler error by wrapping malloc
       1.44  (2014-08-07)
