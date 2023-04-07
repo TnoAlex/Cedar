@@ -9,7 +9,8 @@
 
 class GrayImage : public Image
 {
-
+public:
+    using Image::Image;
 };
 
 

@@ -18,7 +18,7 @@ ABOUT:
    written by a decent optimizing implementation; though providing a custom
    zlib compress function (see STBIW_ZLIB_COMPRESS) can mitigate that.
    This library is designed for source code compactness and simplicity,
-   not optimal Image file size or run-time performance.
+   not optimal Image file chunk_num or run-time performance.
 
 BUILDING:
 
@@ -62,7 +62,7 @@ USAGE:
      int stbi_write_jpg_to_func(stbi_write_func *func, void *context, int x, int y, int comp, const void *data, int quality);
 
    where the callback is:
-      void stbi_write_func(void *context, void *data, int size);
+      void stbi_write_func(void *context, void *data, int chunk_num);
 
    You can configure it with these global variables:
       int stbi_write_tga_with_rle;             // defaults to true; set to 0 to disable RLE
@@ -81,9 +81,9 @@ USAGE:
    Each Pixel contains 'comp' channels of data stored interleaved with 8-bits
    per Channel, in the following order: 1=Y, 2=YA, 3=RGB, 4=RGBA. (Y is
    monochrome color.) The rectangle is 'w' pixels wide and 'h' pixels tall.
-   The *data pointer points to the first byte of the top-left-most Pixel.
-   For PNG, "stride_in_bytes" is the distance in bytes from the first byte of
-   a row of pixels to the first byte of the next row of pixels.
+   The *data pointer points to the first uint of the top-left-most Pixel.
+   For PNG, "stride_in_bytes" is the distance in bytes from the first uint of
+   a row of pixels to the first uint of the next row of pixels.
 
    PNG creates output files with the same number of components as the input.
    The BMP format expands Y to RGB in the file format and does not
@@ -281,9 +281,9 @@ static void stbi__start_write_callbacks(stbi__write_context *s, stbi_write_func 
 
 #ifndef STBI_WRITE_NO_STDIO
 
-static void stbi__stdio_write(void *context, void *data, int size)
+static void stbi__stdio_write(void *context, void *data, int chunk_num)
 {
-   fwrite(data,1,size,(FILE*) context);
+   fwrite(data,1,chunk_num,(FILE*) context);
 }
 
 #if defined(_WIN32) && defined(STBIW_WINDOWS_UTF8)
@@ -742,7 +742,7 @@ static void stbiw__write_hdr_scanline(stbi__write_context *s, int width, int nco
             }
             // if there's a run, output it
             if (r+2 < width) { // same test as what we break out of in search loop, so only true if we break'd
-               // find next byte after run
+               // find next uint after run
                while (r < width && comp[r] == comp[x])
                   ++r;
                // output run up to r
@@ -810,7 +810,7 @@ STBIWDEF int stbi_write_hdr(char const *filename, int x, int y, int comp, const 
 //
 
 #ifndef STBIW_ZLIB_COMPRESS
-// stretchy buffer; stbiw__sbpush() == vector<>::push_back() -- stbiw__sbcount() == vector<>::size()
+// stretchy buffer; stbiw__sbpush() == vector<>::push_back() -- stbiw__sbcount() == vector<>::chunk_num()
 #define stbiw__sbraw(a) ((int *) (void *) (a) - 2)
 #define stbiw__sbm(a)   stbiw__sbraw(a)[0]
 #define stbiw__sbn(a)   stbiw__sbraw(a)[1]
@@ -939,7 +939,7 @@ STBIWDEF unsigned char * stbi_zlib_compress(unsigned char *data, int data_len, i
       stbiw__sbpush(hash_table[h],data+i);
 
       if (bestloc) {
-         // "lazy matching" - check match at *next* byte, and if it's better, do cur byte as literal
+         // "lazy matching" - check match at *next* uint, and if it's better, do cur uint as literal
          h = stbiw__zhash(data+i+1)&(stbiw__ZHASH-1);
          hlist = hash_table[h];
          n = stbiw__sbcount(hlist);
@@ -973,7 +973,7 @@ STBIWDEF unsigned char * stbi_zlib_compress(unsigned char *data, int data_len, i
    for (;i < data_len; ++i)
       stbiw__zlib_huffb(data[i]);
    stbiw__zlib_huff(256); // end of block
-   // pad with 0 bits to byte boundary
+   // pad with 0 bits to uint boundary
    while (bitcount)
       stbiw__zlib_add(0,1);
 

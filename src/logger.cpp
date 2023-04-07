@@ -4,6 +4,22 @@
 #include "logger.h"
 
 
+#include <boost/log/expressions.hpp>
+#include <boost/log/sinks/sync_frontend.hpp>
+#include <boost/log/sinks/text_ostream_backend.hpp>
+#include <boost/log/utility/setup/common_attributes.hpp>
+#include <boost/core/null_deleter.hpp>
+#include <boost/log/support/date_time.hpp>
+#include <boost/log/trivial.hpp>
+#include <iostream>
+#include <iomanip>
+#include <thread>
+
+
+namespace sinks = boost::log::sinks;
+namespace expr = boost::log::expressions;
+namespace attrs = boost::log::attributes;
+
 void coloring_formatter(
         logging::record_view const &rec, logging::formatting_ostream &strm)
 {

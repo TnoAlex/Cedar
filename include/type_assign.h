@@ -6,7 +6,7 @@
 #define CEDAR_TYPE_ASSIGN_H
 
 #define uint unsigned int
-#define uchar unsigned char
+#define byte unsigned char
 #define uint64 unsigned long
 
 #endif //CEDAR_TYPE_ASSIGN_H

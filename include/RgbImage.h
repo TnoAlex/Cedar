@@ -8,11 +8,13 @@
 #include "Image.h"
 #include "GrayImage.h"
 #include <memory>
+#include <string>
 
 class RgbImage : public Image
 {
 public:
-    GrayImage to_gray_image();
+    void to_gray_image(GrayImage &image);
+    using Image::Image;
 };
 
 

@@ -5,12 +5,20 @@
 #include "RgbImage.h"
 
 
-GrayImage RgbImage::to_gray_image()
+void RgbImage::to_gray_image(GrayImage &image)
 {
-    auto new_channel = std::make_shared<Channel>();
-    ublas::matrix<uint> matrix = (*get_chunk(1)) * 0.3 + (*get_chunk(2)) * 0.59 + (*get_chunk(3)) * 0.11;
-    new_channel->chunks->insert({0, std::shared_ptr<ublas::matrix<uint>>(&matrix)});
-    auto new_img = copy();
-    new_img.channel = std::move(new_channel);
-    return (GrayImage) new_img;
+    auto matrix = std::make_shared<ublas::matrix<uint>>(this->height, this->width);
+    ublas::matrix<uint> b = (*get_chunk(1));
+    ublas::matrix<uint> g = (*get_chunk(2));
+    ublas::matrix<uint> r = (*get_chunk(3));
+    for (int i = 0; i < this->height; i++) {
+        for (int j = 0; j < this->width; j++) {
+            (*matrix.get())(i, j) = ceil(r(i,j)*0.3+g(i,j)*0.59+b(i,j)*0.11);
+        }
+    }
+    auto new_channel = std::make_shared<Channel>(matrix, GREY, this->height, this->width);
+    image.channel = std::move(new_channel);
+    image.height = this->height;
+    image.width = this->width;
+    image.type = GREY;
 }
