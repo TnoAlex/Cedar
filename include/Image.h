@@ -28,7 +28,7 @@ public:
 
     void show() const;
 
-    [[nodiscard]] std::shared_ptr<ublas::matrix<uint>> get_chunk(int d) const;
+    [[nodiscard]] std::shared_ptr<ublas::matrix<uchar>> get_chunk(int d) const;
 
 };
 

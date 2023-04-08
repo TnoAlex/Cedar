@@ -21,7 +21,7 @@ std::map<unsigned int, std::string> ImageTypeString = {
         {4,"RGB_WITH_ALPHA"}
 };
 
-Image::Image(byte *raw, int w, int h, int type)
+Image::Image(uchar *raw, int w, int h, int type)
 {
             BOOST_LOG_TRIVIAL(info) << "Load Image" << "\n";
     this->width = w;
@@ -36,7 +36,7 @@ Image::Image(const std::string &fileName)
 {
     BOOST_LOG_TRIVIAL(info) << "Load Image";
     int n =0;
-    byte * data =  stbi_load(fileName.c_str(),&this->width,&this->height,&n,0);
+    uchar * data =  stbi_load(fileName.c_str(), &this->width, &this->height, &n, 0);
     this->type = (ImageType)n;
     this->channel = std::make_shared<Channel>(this->type, height, width, data);
     BOOST_LOG_TRIVIAL(info) <<"\n"<< "width : " << width << "px" << "\n" << "height: "
@@ -44,7 +44,7 @@ Image::Image(const std::string &fileName)
 }
 
 
-std::shared_ptr<ublas::matrix<uint>> Image::get_chunk(int d) const
+std::shared_ptr<ublas::matrix<uchar>> Image::get_chunk(int d) const
 {
     assert(d <= (uint) this->type && d >= 1);
     return this->channel->chunks->at(d);
@@ -52,7 +52,7 @@ std::shared_ptr<ublas::matrix<uint>> Image::get_chunk(int d) const
 
 void Image::show() const
 {
-//    byte *raw = channel->to_raw();
+//    uchar *raw = channel->to_raw();
 //    stbi_write_png("test.png",width,height,1,raw,0);
     HWND hwnd = GetForegroundWindow();
     HDC hdc = GetDC(hwnd);
@@ -60,8 +60,8 @@ void Image::show() const
     GetWindowRect(hwnd, &rect);
     int i_h = ceil((rect.bottom - rect.top) * 0.75);
     int i_w = ceil((rect.right - rect.left) * 0.75);
-    byte *raw = channel->to_raw();
-    byte *resize_raw = raw;
+    uchar *raw = channel->to_raw().get();
+    uchar *resize_raw = raw;
     if (width > i_w || height > i_h) {
         int alpha = -1;
         if (type == GREY_WITH_ALPHA || type == RGB_WITH_ALPHA) {
@@ -81,10 +81,10 @@ void Image::show() const
                 SetPixel(hdc, this->width-l, this->height - i, RGB(pixel, pixel, pixel));
             } else {
                 uint r=0, g=0, b=0;
-                r = (*get_chunk(1))(i,l);
-                g = (*get_chunk(2))(i,l);
-                b = (*get_chunk(3))(i,l);
-                SetPixel(hdc, this->width-l,  this->height-i, RGB(r, g, b));
+                r = (*get_chunk(1))(i,this->width-l-1);
+                g = (*get_chunk(2))(i,this->width-l-1);
+                b = (*get_chunk(3))(i,this->width-l-1);
+                SetPixel(hdc, l,  i, RGB(r, g, b));
             }
         }
     }

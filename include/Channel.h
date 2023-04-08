@@ -20,16 +20,16 @@ public:
     int chunk_num = 0;
     int chunk_row = 0;
     int chunk_col = 0;
-    map<int, shared_ptr<ublas::matrix<uint>>> *chunks{};
+    map<int, shared_ptr<ublas::matrix<uchar>>> *chunks{};
 
     Channel();
 
-    Channel(ImageType type, int row, int col, const byte *raw);
-    Channel(const shared_ptr<ublas::matrix<uint>>&matrix, int num,int row,int col);
+    Channel(ImageType type, int row, int col, const uchar *raw);
+    Channel(const shared_ptr<ublas::matrix<uchar>>&matrix, int num, int row, int col);
 
     ~Channel();
 
-    [[nodiscard]] byte * to_raw() const;
+    [[nodiscard]] shared_ptr<uchar[]> to_raw() const;
 };
 
 #endif //CEDAR_CHANNEL_H
