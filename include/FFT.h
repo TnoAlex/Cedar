@@ -18,13 +18,13 @@ namespace ublas = boost::numeric::ublas;
 class FFT
 {
 public:
-    static std::shared_ptr<uchar[]> centralization(const std::shared_ptr<uchar[]> &data, uint row, uint col);
+    static std::shared_ptr<uchar[]> scale(const std::shared_ptr<double[]> &data, uint row, uint col);
 
     static void fft(container::stable_vector<Complex> &c, int lim, int opt);
 
     static void fft2d(ublas::matrix<Complex> &src, ublas::matrix<Complex> &des, int opt);
 
-    static void byte_2_complex(ublas::matrix<Complex> &des, const std::shared_ptr<uchar[]> &data, uint row, uint col);
+    static void byte_2_complex(ublas::matrix<Complex> &des, const std::shared_ptr<uchar[]> &data);
 
     static void complex_2_byte(ublas::matrix<Complex> &data, const std::shared_ptr<uchar[]> &des);
 

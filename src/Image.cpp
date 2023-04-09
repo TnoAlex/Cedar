@@ -43,6 +43,13 @@ Image::Image(const std::string &fileName)
                       << height << "\n" << "type: " << ImageTypeString[type] ;
 }
 
+Image::Image(const shared_ptr<ublas::matrix<unsigned char>> &matrix, int num, int row, int col)
+{
+    this->width = col;
+    this->height = row;
+    this->type = (ImageType)num;
+    this->channel = make_shared<Channel>(matrix,num,row,col);
+}
 
 std::shared_ptr<ublas::matrix<uchar>> Image::get_chunk(int d) const
 {
@@ -50,44 +57,46 @@ std::shared_ptr<ublas::matrix<uchar>> Image::get_chunk(int d) const
     return this->channel->chunks->at(d);
 }
 
-void Image::show() const
+void Image::show(const string &fileName) const
 {
-//    uchar *raw = channel->to_raw();
-//    stbi_write_png("test.png",width,height,1,raw,0);
-    HWND hwnd = GetForegroundWindow();
-    HDC hdc = GetDC(hwnd);
-    RECT rect = {};
-    GetWindowRect(hwnd, &rect);
-    int i_h = ceil((rect.bottom - rect.top) * 0.75);
-    int i_w = ceil((rect.right - rect.left) * 0.75);
-    uchar *raw = channel->to_raw().get();
-    uchar *resize_raw = raw;
-    if (width > i_w || height > i_h) {
-        int alpha = -1;
-        if (type == GREY_WITH_ALPHA || type == RGB_WITH_ALPHA) {
-            alpha = width * height * (int) (type - 1);
-        }
-        stbir_resize(raw, width, height, 0,
-                     resize_raw, i_w, i_h, 0, STBIR_TYPE_UINT32,
-                     (int) type, alpha, 0, STBIR_EDGE_CLAMP,
-                     STBIR_EDGE_CLAMP,
-                     STBIR_FILTER_BOX, STBIR_FILTER_BOX,
-                     STBIR_COLORSPACE_SRGB, nullptr);
-    }
-    for (int i = 0; i < height; i++) {
-        for (int l = 0; l < width; l++) {
-            if (type == GREY || type == GREY_WITH_ALPHA) {
-                uint pixel = (*get_chunk(1))(i,l);
-                SetPixel(hdc, this->width-l, this->height - i, RGB(pixel, pixel, pixel));
-            } else {
-                uint r=0, g=0, b=0;
-                r = (*get_chunk(1))(i,this->width-l-1);
-                g = (*get_chunk(2))(i,this->width-l-1);
-                b = (*get_chunk(3))(i,this->width-l-1);
-                SetPixel(hdc, l,  i, RGB(r, g, b));
-            }
-        }
-    }
-    ReleaseDC(hwnd,hdc);
+    auto raw = channel->to_raw();
+    stbi_write_png(fileName.c_str(),width,height,1,raw.get(),0);
+//    HWND hwnd = GetForegroundWindow();
+//    HDC hdc = GetDC(hwnd);
+//    RECT rect = {};
+//    GetWindowRect(hwnd, &rect);
+//    int i_h = ceil((rect.bottom - rect.top) * 0.75);
+//    int i_w = ceil((rect.right - rect.left) * 0.75);
+//    uchar *raw = channel->to_raw().get();
+//    uchar *resize_raw = raw;
+//    if (width > i_w || height > i_h) {
+//        int alpha = -1;
+//        if (type == GREY_WITH_ALPHA || type == RGB_WITH_ALPHA) {
+//            alpha = width * height * (int) (type - 1);
+//        }
+//        stbir_resize(raw, width, height, 0,
+//                     resize_raw, i_w, i_h, 0, STBIR_TYPE_UINT32,
+//                     (int) type, alpha, 0, STBIR_EDGE_CLAMP,
+//                     STBIR_EDGE_CLAMP,
+//                     STBIR_FILTER_BOX, STBIR_FILTER_BOX,
+//                     STBIR_COLORSPACE_SRGB, nullptr);
+//    }
+//    for (int i = 0; i < height; i++) {
+//        for (int l = 0; l < width; l++) {
+//            if (type == GREY || type == GREY_WITH_ALPHA) {
+//                uint pixel = (*get_chunk(1))(i,l);
+//                SetPixel(hdc, this->width-l, this->height - i, RGB(pixel, pixel, pixel));
+//            } else {
+//                uint r=0, g=0, b=0;
+//                r = (*get_chunk(1))(i,this->width-l-1);
+//                g = (*get_chunk(2))(i,this->width-l-1);
+//                b = (*get_chunk(3))(i,this->width-l-1);
+//                SetPixel(hdc, l,  i, RGB(r, g, b));
+//            }
+//        }
+//    }
+//    ReleaseDC(hwnd,hdc);
 }
+
+
 

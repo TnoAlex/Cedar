@@ -7,6 +7,13 @@
 
 void RgbImage::to_gray_image(GrayImage &image)
 {
+    if(this->type == GREY){
+        image.channel = this->channel;
+        image.height = this->height;
+        image.width = this->width;
+        image.type = GREY;
+        return;
+    }
     auto matrix = std::make_shared<ublas::matrix<uchar>>(this->height, this->width);
     ublas::matrix<uchar> b = (*get_chunk(1));
     ublas::matrix<uchar> g = (*get_chunk(2));

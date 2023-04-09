@@ -6,14 +6,23 @@
 
 const auto PI = acos(-1);
 
-std::shared_ptr<unsigned char[]> FFT::centralization(const std::shared_ptr<uchar[]> &data, uint row, uint col)
+std::shared_ptr<uchar[]> FFT::scale(const std::shared_ptr<double[]> &data, uint row, uint col)
 {
     uint size = row * col;
     auto out_data = std::make_shared<uchar[]>(size);
+    double max = data[0];
+    double min = data[1];
+
+    for (int i = 0; i < size; i++) {
+        max = max > data[i] ? max : data[i];
+        min = min < data[i] ? min : data[i];
+    }
+
+    double sc = 255.0 / (max - min);
     for (uint i = 0; i < size; i++) {
-        uint j = i + row * col / 2 + row / 2;
+        uint j = i + size / 2 + col / 2;
         if (j > size) j = j - size;   //低频移至中间
-        out_data[i] = data[j];
+        out_data[i] = (uchar) ((data[j] - min) * sc);
     }
     return out_data;
 }
@@ -72,7 +81,7 @@ void FFT::fft2d(ublas::matrix<Complex> &src, ublas::matrix<Complex> &des, int op
         }
     }
     for (int i = 0; i < src.size2(); i++) {
-        auto col = ublas::column(src, i);
+        auto col = ublas::column(des, i);
         auto col_vec = container::stable_vector<Complex>(col.begin(), col.end());
         fft(col_vec, (int) src.size1(), opt);
         for (int j = 0; j < src.size1(); j++) {
@@ -81,8 +90,10 @@ void FFT::fft2d(ublas::matrix<Complex> &src, ublas::matrix<Complex> &des, int op
     }
 }
 
-void FFT::byte_2_complex(ublas::matrix<Complex> &des, const std::shared_ptr<uchar[]> &data, uint row, uint col)
+void FFT::byte_2_complex(ublas::matrix<Complex> &des,  const std::shared_ptr<uchar[]> &data)
 {
+    uint row = des.size1();
+    uint col= des.size2();
     for (int i = 0; i < row; i++) {
         for (int j = 0; j < col; j++) {
             des(i, j) = Complex((data)[i * (int) col + j], 0);
@@ -114,12 +125,11 @@ void FFT::complex_2_double(ublas::matrix<Complex> &data, const std::shared_ptr<d
 }
 
 template<class T>
-void FFT::array_2_matrix(ublas::matrix<T> &matrix, const std::shared_ptr<T[]> &array,uint row,uint col)
+void FFT::array_2_matrix(ublas::matrix<T> &matrix, const std::shared_ptr<T[]> &array, uint row, uint col)
 {
-    for(int i=0;i<row;i++){
-        for(int j=0;j<col;j++){
-            matrix(i,j) = array[i * (int) col + j];
+    for (int i = 0; i < row; i++) {
+        for (int j = 0; j < col; j++) {
+            matrix(i, j) = array[i * (int) col + j];
         }
     }
 }
-

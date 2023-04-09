@@ -22,11 +22,12 @@ public:
 
     Image() = default;
 
+    Image(const shared_ptr<ublas::matrix<uchar>>&matrix, int num, int row, int col);
     Image(unsigned char *raw, int w, int h, int type);
 
     explicit Image(const std::string &fileName);
 
-    void show() const;
+    void show(const string &fileName) const;
 
     [[nodiscard]] std::shared_ptr<ublas::matrix<uchar>> get_chunk(int d) const;
 
