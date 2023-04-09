@@ -11,7 +11,7 @@ Complex Complex::operator+(const Complex c) const
 
 Complex Complex::operator-(const Complex c) const
 {
-    return {c.r - r, c.i - i};
+    return {r-c.r, i-c.i};
 }
 
 Complex Complex::operator*(const Complex c) const

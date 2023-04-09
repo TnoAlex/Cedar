@@ -37,6 +37,10 @@ Image::Image(const std::string &fileName)
     BOOST_LOG_TRIVIAL(info) << "Load Image";
     int n =0;
     uchar * data =  stbi_load(fileName.c_str(), &this->width, &this->height, &n, 0);
+    if(data==nullptr){
+        BOOST_LOG_TRIVIAL(error) <<"Can not access the file";
+        throw std::exception("IOException");
+    }
     this->type = (ImageType)n;
     this->channel = std::make_shared<Channel>(this->type, height, width, data);
     BOOST_LOG_TRIVIAL(info) <<"\n"<< "width : " << width << "px" << "\n" << "height: "

@@ -27,6 +27,17 @@ std::shared_ptr<uchar[]> FFT::scale(const std::shared_ptr<double[]> &data, uint 
     return out_data;
 }
 
+int FFT::reverse_bin(int a, int n)
+{
+    int ret = 0;
+    for (int i = 0; i < n; i++) {
+        if (a & (1 << i)) {
+            ret |= ((0x01 << (n - 1)) >> i);
+        }
+    }
+    return ret;
+}
+
 void FFT::fft(container::stable_vector<Complex> &c, int lim, int opt)
 {
     container::stable_vector<Complex> tC0(lim);
@@ -36,7 +47,7 @@ void FFT::fft(container::stable_vector<Complex> &c, int lim, int opt)
     }
     container::stable_vector<Complex> WN(lim / 2);
     for (int i = 0; i < lim / 2; i++) {
-        WN[i] = Complex(cos(2 * PI * i / lim), opt * (-sin(2 * PI * i / lim)));
+        WN[i] = Complex(cos(2 * PI / lim * i), -opt * (sin(2 * PI / lim * i)));
     }
     for (int i = 2; i <= lim; i *= 2) {
         for (int j = 0; j < lim / i; j++) {
@@ -59,16 +70,7 @@ void FFT::fft(container::stable_vector<Complex> &c, int lim, int opt)
     }
 }
 
-int FFT::reverse_bin(int a, int n)
-{
-    int ret = 0;
-    for (int i = 0; i < n; i++) {
-        if (a & (1 << i)) {
-            ret |= (1 << (n - 1 - i));
-        }
-    }
-    return ret;
-}
+
 
 void FFT::fft2d(ublas::matrix<Complex> &src, ublas::matrix<Complex> &des, int opt)
 {
@@ -90,10 +92,10 @@ void FFT::fft2d(ublas::matrix<Complex> &src, ublas::matrix<Complex> &des, int op
     }
 }
 
-void FFT::byte_2_complex(ublas::matrix<Complex> &des,  const std::shared_ptr<uchar[]> &data)
+void FFT::byte_2_complex(ublas::matrix<Complex> &des, const std::shared_ptr<uchar[]> &data)
 {
     uint row = des.size1();
-    uint col= des.size2();
+    uint col = des.size2();
     for (int i = 0; i < row; i++) {
         for (int j = 0; j < col; j++) {
             des(i, j) = Complex((data)[i * (int) col + j], 0);
