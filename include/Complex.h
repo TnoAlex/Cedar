@@ -19,6 +19,8 @@ public:
 
     Complex operator-(Complex c) const;
 
+    Complex operator-() const;
+
     Complex operator*(Complex c) const;
 
     Complex operator*(double c) const;

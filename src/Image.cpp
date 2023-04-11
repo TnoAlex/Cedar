@@ -26,8 +26,6 @@ Image::Image(uchar *raw, int w, int h, int type)
     this->height = h;
     this->type = (ImageType) type;
     this->channel = std::make_shared<Channel>(this->type, h, w, raw);
-    BOOST_LOG_TRIVIAL(info) << "width : " << w << "px" << "\n" << "height: "
-                            << h << "\n" << "type: " << ImageTypeString[type] << "\n";
 }
 
 Image::Image(const std::string &fileName)
@@ -43,7 +41,7 @@ Image::Image(const std::string &fileName)
     this->channel = std::make_shared<Channel>(this->type, height, width, data);
     stbi_image_free(data);
     BOOST_LOG_TRIVIAL(info) << "\n" << "width : " << width << "px" << "\n" << "height: "
-                            << height << "\n" << "type: " << ImageTypeString[type];
+                            << height <<"px"<< "\n" << "type: " << ImageTypeString[type];
 }
 
 Image::Image(vector<shared_ptr<ublas::matrix<unsigned char>>> &matrix, int num, int row, int col)
@@ -63,6 +61,7 @@ std::shared_ptr<ublas::matrix<uchar>> Image::get_chunk(int d) const
 
 void Image::swimg(const string &fileName) const
 {
+    BOOST_LOG_TRIVIAL(info)<<"out -> "<<fileName;
     auto raw = channel->to_raw();
     stbi_write_bmp(fileName.c_str(), width, height, 1, raw.get());
 }

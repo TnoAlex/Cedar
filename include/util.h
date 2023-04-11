@@ -31,7 +31,7 @@ enum class EDGE_TYPE{
 };
 
 template<class T>
-void array_2_complex(ublas::matrix<Complex> &des, const std::shared_ptr<T []> &data){
+void array_2_complex(const std::shared_ptr<T []> &data,ublas::matrix<Complex> &des){
     uint row = des.size1();
     uint col = des.size2();
     for (int i = 0; i < row; i++) {

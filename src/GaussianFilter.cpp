@@ -1,29 +1,5 @@
 ﻿#include "GaussianFilter.h"
 
-void center_matrix(ublas::matrix<Complex> &matrix_fft)
-{
-    int rows = matrix_fft.size1();
-    int cols = matrix_fft.size2();
-    int center_row = rows / 2;
-    int center_col = cols / 2;
-
-    for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < cols; j++) {
-            if ((i + j) % 2 == 1) {
-                matrix_fft(i, j) = {-matrix_fft(i, j).r, -matrix_fft(i, j).i};
-            }
-        }
-    }
-
-    ublas::matrix<Complex> tmp(rows, cols);
-    for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < cols; j++) {
-            tmp(i, j) = matrix_fft((i + center_row) % rows, (j + center_col) % cols);
-        }
-    }
-
-    matrix_fft.swap(tmp);
-}
 
 void crop_matrix(ublas::matrix<Complex> &matrix_fft, int rows, int cols)
 {
