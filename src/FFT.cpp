@@ -20,9 +20,7 @@ std::shared_ptr<uchar[]> FFT::scale(const std::shared_ptr<double[]> &data, uint 
 
     double sc = 255.0 / (max - min);
     for (uint i = 0; i < size; i++) {
-        uint j = i + size / 2 + col / 2;
-        if (j > size) j = j - size;   //低频移至中间
-        out_data[i] = (uchar) ((data[j] - min) * sc);
+        out_data[i] = (uchar) ((data[i] - min) * sc);
     }
     return out_data;
 }
@@ -92,46 +90,43 @@ void FFT::fft2d(ublas::matrix<Complex> &src, ublas::matrix<Complex> &des, int op
     }
 }
 
-void FFT::byte_2_complex(ublas::matrix<Complex> &des, const std::shared_ptr<uchar[]> &data)
-{
-    uint row = des.size1();
-    uint col = des.size2();
-    for (int i = 0; i < row; i++) {
-        for (int j = 0; j < col; j++) {
-            des(i, j) = Complex((data)[i * (int) col + j], 0);
+
+void FFT::do_fft(ublas::matrix<Complex> &src, ublas::matrix<Complex> &des,int type){
+    int row = src.size1();
+    int col = src.size2();
+    ublas::matrix<Complex> padding_img;
+    if (row % 2 != 0 && col % 2 == 0) {
+        padding_img = padding_image(src, 0);
+        row++;
+    } else if (col % 2 != 0 && row % 2 == 0) {
+        padding_img = padding_image(src, 1);
+        col++;
+    } else if (col % 2 != 0 && row % 2 != 0) {
+        padding_img = padding_image(src, 2);
+        col++;
+        row++;
+    } else {
+        padding_img = src;
+    }
+    ublas::matrix<Complex> padding_des(padding_img.size1(),padding_img.size2());
+    fft2d(padding_img,padding_des,type);
+
+    int r_s = row - src.size1();
+    int c_s = col - src.size2();
+    for (uint i = 0; i < src.size1(); i++) {
+        for (uint j = 0; j < src.size2(); j++) {
+            des(i, j) = padding_des(i + r_s, j + c_s);
         }
     }
 }
 
-void FFT::complex_2_byte(ublas::matrix<Complex> &data, const std::shared_ptr<unsigned char[]> &des)
+void FFT::DFT(ublas::matrix<Complex> &src, ublas::matrix<Complex> &des)
 {
-    int pos = 0;
-    for (auto row = data.begin1(); row != data.end1(); row++) {
-        for (auto col = row.begin(); col != row.end(); col++) {
-            des[pos] = (uchar) sqrt((*col).r * (*col).r);
-            pos++;
-        }
-    }
+    do_fft(src,des,1);
 }
 
-void FFT::complex_2_double(ublas::matrix<Complex> &data, const std::shared_ptr<double[]> &des)
+void FFT::IDFT(ublas::matrix<Complex> &src, ublas::matrix<Complex> &des)
 {
-    int pos = 0;
-    for (auto row = data.begin1(); row != data.end1(); row++) {
-        for (auto col = row.begin(); col != row.end(); col++) {
-            double g = sqrt((*col).r * (*col).r + (*col).i * (*col).i);
-            des[pos] = log(g + 1);
-            pos++;
-        }
-    }
+    do_fft(src,des,-1);
 }
 
-template<class T>
-void FFT::array_2_matrix(ublas::matrix<T> &matrix, const std::shared_ptr<T[]> &array, uint row, uint col)
-{
-    for (int i = 0; i < row; i++) {
-        for (int j = 0; j < col; j++) {
-            matrix(i, j) = array[i * (int) col + j];
-        }
-    }
-}

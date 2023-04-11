@@ -21,6 +21,8 @@ public:
 
     Complex operator*(Complex c) const;
 
+    Complex operator*(double c) const;
+
     Complex operator/(int b) const;
 
     bool operator==(Complex c) const;

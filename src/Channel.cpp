@@ -61,4 +61,17 @@ Channel::Channel(const shared_ptr<ublas::matrix<uchar>>& matrix, int num, int ro
     this->chunk_col = col;
 }
 
+Channel::Channel(vector<shared_ptr<ublas::matrix<unsigned char>>> &matrix, int num, int row, int col)
+{
+    this->chunks = new map<int, shared_ptr<ublas::matrix<uchar>>>();
+    this->chunk_num = num;
+    this->chunk_row = row;
+    this->chunk_col = col;
+    int pos =1;
+    for(const auto& i:matrix){
+        chunks->insert({pos,i});
+        pos++;
+    }
+}
+
 Channel::Channel() = default;

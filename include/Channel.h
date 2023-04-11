@@ -27,6 +27,8 @@ public:
     Channel(ImageType type, int row, int col, const uchar *raw);
     Channel(const shared_ptr<ublas::matrix<uchar>>&matrix, int num, int row, int col);
 
+    Channel(std::vector<shared_ptr<ublas::matrix<uchar>>>&matrix, int num, int row, int col);
+
     ~Channel();
 
     [[nodiscard]] shared_ptr<uchar[]> to_raw() const;

@@ -35,4 +35,9 @@ bool Complex::operator!=(const Complex c) const
     return c.r != r || c.i !=i;
 }
 
+Complex Complex::operator*(double c) const
+{
+    return {r*c, i*c};
+}
+
 

@@ -10,7 +10,7 @@ set(Boost_DEBUG on)
 set(BOOST_ROOT D:/Boost/boost_1.81_0)
 set(BOOST_INCLUDE_DIR ${BOOST_ROOT}/boost)
 set(BOOST_LIBRARY_DIR ${BOOST_ROOT}/lib)
-find_package(Boost COMPONENTS REQUIRED filesystem program_options log)
+find_package(Boost COMPONENTS REQUIRED  program_options log)
 
 file(GLOB_RECURSE SRC_FILES ${PROJECT_SOURCE_DIR}/src/*.cpp ${PROJECT_SOURCE_DIR}/src/*.c)
 file(GLOB_RECURSE INC_FILES ${PROJECT_SOURCE_DIR}/include/*.h)
@@ -20,11 +20,11 @@ add_definitions(-D_WIN32_WINNT=0x0601)
 add_definitions(-D_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING)
 add_executable(${PROJECT_NAME} CedarApplication.cpp ${SRC_FILES})
 
-foreach (_var ${SRC_FILES})
+foreach (_var ${CMAKE_PREFIX_PATH})
     message(${_var})
 endforeach ()
 
-link_libraries(${Boost_LIBRARIES})
+link_libraries(${Boost_LIBRARIES} Cedar)
 
 include_directories(${BOOST_ROOT} ${PROJECT_SOURCE_DIR}/include)
 target_link_libraries(Cedar ${Boost_LIBRARIES})
